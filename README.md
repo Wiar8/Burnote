@@ -46,14 +46,14 @@ Burnote follows a zero-knowledge architecture. The encryption key (your password
 **Key derivation:** PBKDF2 with SHA-256, 200,000 iterations
 **Transport:** TLS for all network communication
 
-> If you find a security vulnerability, please **do not** open a public issue. Email [security@burnote.app](mailto:security@burnote.app) instead.
+> If you find a security vulnerability, please **do not** open a public issue. See [SECURITY.md](SECURITY.md) — email [sebastian@wiar8.com](mailto:sebastian@wiar8.com) instead.
 
 ---
 
 ## Getting started
 
 ```bash
-git clone https://github.com/your-username/burnote
+git clone https://github.com/wiar8/burnote
 cd burnote
 cp .env.example .env.local
 npm install
