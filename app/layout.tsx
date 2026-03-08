@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Fraunces, Outfit, Geist_Mono } from "next/font/google";
+import Footer from "@/components/Footer";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -39,6 +40,7 @@ export default function RootLayout({
     >
       <body className="bg-stone-950 text-stone-100 font-sans antialiased min-h-screen">
         {children}
+        <Footer />
       </body>
     </html>
   );

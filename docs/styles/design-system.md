@@ -204,6 +204,54 @@ Tailwind: font-mono text-sm text-stone-100 whitespace-pre-wrap break-all
 
 ---
 
+## Icons
+
+### Library
+
+[Phosphor Icons](https://phosphoricons.com/) (`@phosphor-icons/react`) — chosen for its clean geometry and weight system that complements Outfit's geometric sans-serif.
+
+### Principles
+
+- **Functional only** — icons appear where they reduce cognitive load or communicate state. No decorative icons above headings.
+- **Inline context** — icons sit beside their label at matching optical size, not above or isolated.
+- **`weight="fill"`** for high-emphasis moments (fire brand element). `weight="regular"` or `weight="bold"` for interactive controls.
+
+### Usage Map
+
+| Icon | Component | Size | Weight | Purpose |
+|---|---|---|---|---|
+| `Fire` | Burn-after-read toggle label | 12 | `fill` | Reinforces what "burn" means; amber-500/70 |
+| `Fire` | "Burned — cannot be viewed again" | 12 | `fill` | Brand payoff moment; amber-500 |
+| `Lock` | Password input (create + view) | 14 | `regular` | Universal affordance; stone-600, left-inset |
+| `CopySimple` → `Check` | Copy link button | 14 | `regular` / `bold` | State feedback on copy action |
+| `Plus` | New note button | 13 | `regular` | Lightweight action affordance |
+| `Eye` | Reveal secret button | 15 | `bold` | Clear reveal affordance |
+| `Globe` / `XLogo` / `GithubLogo` | Footer social links | 16 | `regular` | Navigation; stone-600 → hover:stone-400 |
+
+### Icon in Input Pattern
+
+Password fields use a left-inset icon with `pointer-events-none` to avoid blocking clicks:
+
+```tsx
+<div className="relative">
+  <Lock size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-600 pointer-events-none" />
+  <input className="... pl-10" />
+</div>
+```
+
+### Button with Icon Pattern
+
+Icons in buttons use `flex items-center justify-center gap-2`:
+
+```tsx
+<button className="... flex items-center justify-center gap-2">
+  <Eye size={15} weight="bold" />
+  Reveal secret
+</button>
+```
+
+---
+
 ## UX Writing
 
 | Context | Copy |

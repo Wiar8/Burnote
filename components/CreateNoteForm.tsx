@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { encrypt } from "@/lib/crypto";
 import { ExpiryOption } from "@/types/note";
+import { Fire, Lock, CopySimple, Check, Plus } from "@phosphor-icons/react";
 
 type Step = "form" | "done";
 
@@ -77,14 +78,16 @@ export default function CreateNoteForm() {
         <div className="border-t border-stone-800 pt-5 flex gap-3">
           <button
             onClick={copyUrl}
-            className="flex-1 rounded-lg border border-stone-800 bg-stone-900 px-4 py-2.5 text-sm text-stone-100 transition-all duration-150 hover:border-amber-500/40 active:scale-[0.97]"
+            className="flex-1 rounded-lg border border-stone-800 bg-stone-900 px-4 py-2.5 text-sm text-stone-100 transition-all duration-150 hover:border-amber-500/40 active:scale-[0.97] flex items-center justify-center gap-2"
           >
+            {copied ? <Check size={14} weight="bold" /> : <CopySimple size={14} />}
             {copied ? "Copied!" : "Copy link"}
           </button>
           <button
             onClick={reset}
-            className="flex-1 rounded-lg px-4 py-2.5 text-sm text-stone-500 transition-colors hover:text-stone-100"
+            className="flex-1 rounded-lg px-4 py-2.5 text-sm text-stone-500 transition-colors hover:text-stone-100 flex items-center justify-center gap-1.5"
           >
+            <Plus size={13} />
             New note
           </button>
         </div>
@@ -107,13 +110,16 @@ export default function CreateNoteForm() {
         className={`${field} resize-none`}
       />
 
-      <input
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="Encryption password"
-        className={field}
-      />
+      <div className="relative">
+        <Lock size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-600 pointer-events-none" />
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Encryption password"
+          className={`${field} pl-10`}
+        />
+      </div>
 
       <div className="flex items-center gap-3 pt-1">
         <select
@@ -137,7 +143,10 @@ export default function CreateNoteForm() {
             <div className="w-8 h-4 rounded-full border border-stone-700 bg-stone-900 peer-checked:border-amber-500/50 peer-checked:bg-amber-500/10 transition-colors duration-200" />
             <div className="absolute top-0.5 left-0.5 w-3 h-3 rounded-full bg-stone-600 peer-checked:translate-x-4 peer-checked:bg-amber-500 transition-all duration-200" />
           </div>
-          <span className="text-xs text-stone-500">Burn after read</span>
+          <span className="text-xs text-stone-500 flex items-center gap-1">
+            <Fire size={12} weight="fill" className="text-amber-500/70" />
+            Burn after read
+          </span>
         </label>
       </div>
 

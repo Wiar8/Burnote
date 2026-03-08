@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { decrypt } from "@/lib/crypto";
+import { Fire, Lock, Eye } from "@phosphor-icons/react";
 
 type State = "idle" | "loading" | "decrypted" | "error";
 
@@ -49,7 +50,8 @@ export default function ViewNote({ id }: { id: string }) {
     return (
       <div className="animate-fade-in space-y-4">
         {burned && (
-          <p className="text-xs text-amber-500 uppercase tracking-widest font-medium">
+          <p className="text-xs text-amber-500 uppercase tracking-widest font-medium flex items-center gap-1.5">
+            <Fire size={12} weight="fill" />
             Burned — cannot be viewed again
           </p>
         )}
@@ -71,14 +73,17 @@ export default function ViewNote({ id }: { id: string }) {
         </p>
       </div>
 
-      <input
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="Password"
-        autoFocus
-        className="w-full rounded-lg border border-stone-800 bg-stone-900 px-4 py-3 text-sm text-stone-100 placeholder:text-stone-600 focus:outline-none focus:border-amber-500/50 transition-colors duration-200"
-      />
+      <div className="relative">
+        <Lock size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-600 pointer-events-none" />
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Password"
+          autoFocus
+          className="w-full rounded-lg border border-stone-800 bg-stone-900 pl-10 pr-4 py-3 text-sm text-stone-100 placeholder:text-stone-600 focus:outline-none focus:border-amber-500/50 transition-colors duration-200"
+        />
+      </div>
 
       {state === "error" && (
         <p className="text-xs text-red-400 animate-fade-in">{error}</p>
@@ -87,8 +92,9 @@ export default function ViewNote({ id }: { id: string }) {
       <button
         type="submit"
         disabled={state === "loading" || !password}
-        className="w-full rounded-lg bg-amber-500 px-4 py-3 text-sm font-semibold text-stone-950 transition-all duration-150 hover:bg-amber-400 active:scale-[0.97] disabled:opacity-40 disabled:cursor-not-allowed"
+        className="w-full rounded-lg bg-amber-500 px-4 py-3 text-sm font-semibold text-stone-950 transition-all duration-150 hover:bg-amber-400 active:scale-[0.97] disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
+        {state !== "loading" && <Eye size={15} weight="bold" />}
         {state === "loading" ? "Decrypting..." : "Reveal secret"}
       </button>
     </form>
