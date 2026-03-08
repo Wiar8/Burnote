@@ -7,14 +7,20 @@ export default async function NotePage({
 }) {
   const { id } = await params;
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center px-4">
-      <div className="w-full max-w-xl">
-        <header className="mb-10">
-          <a href="/" className="text-2xl font-bold tracking-tight text-white">
-            burn<span className="text-zinc-500">note</span>
+    <main className="flex min-h-screen flex-col items-center justify-center px-6 py-16">
+      <div className="w-full max-w-[440px]">
+        <header className="animate-fade-up mb-12">
+          <a
+            href="/"
+            className="font-display text-5xl font-black tracking-tight leading-none inline-block"
+          >
+            <span className="text-amber-500">burn</span>ote
           </a>
         </header>
-        <ViewNote id={id} />
+
+        <div className="animate-fade-up" style={{ animationDelay: "90ms" }}>
+          <ViewNote id={id} />
+        </div>
       </div>
     </main>
   );
