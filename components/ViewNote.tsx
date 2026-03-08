@@ -9,6 +9,7 @@ export default function ViewNote({ id }: { id: string }) {
   const [password, setPassword] = useState("");
   const [state, setState] = useState<State>("idle");
   const [plaintext, setPlaintext] = useState("");
+  const [burned, setBurned] = useState(false);
   const [error, setError] = useState("");
 
   async function handleDecrypt(e: React.FormEvent) {
@@ -27,14 +28,15 @@ export default function ViewNote({ id }: { id: string }) {
         return;
       }
 
-      const { ciphertext, iv, salt } = await res.json();
+      const { ciphertext, iv, salt, burnAfterRead } = await res.json();
+      setBurned(burnAfterRead);
 
       try {
         const text = await decrypt(ciphertext, iv, salt, password);
         setPlaintext(text);
         setState("decrypted");
       } catch {
-        setError("Wrong password or corrupted note.");
+        setError("Wrong password — could not decrypt.");
         setState("error");
       }
     } catch {
@@ -45,30 +47,27 @@ export default function ViewNote({ id }: { id: string }) {
 
   if (state === "decrypted") {
     return (
-      <div className="space-y-4">
-        <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-6">
-          <p className="text-xs text-zinc-500 uppercase tracking-wider mb-3">
-            Secret note
+      <div className="animate-fade-in space-y-4">
+        {burned && (
+          <p className="text-xs text-amber-500 uppercase tracking-widest font-medium">
+            Burned — cannot be viewed again
           </p>
-          <pre className="whitespace-pre-wrap break-all text-sm text-white font-mono">
-            {plaintext}
-          </pre>
-        </div>
-        <p className="text-xs text-zinc-600 text-center">
-          This note has been burned and cannot be viewed again.
-        </p>
+        )}
+        <pre className="whitespace-pre-wrap break-all font-mono text-sm text-stone-100 leading-relaxed rounded-lg border border-stone-800 bg-stone-900 px-5 py-4">
+          {plaintext}
+        </pre>
       </div>
     );
   }
 
   return (
     <form onSubmit={handleDecrypt} className="space-y-4">
-      <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-6">
-        <p className="text-sm text-zinc-400 mb-1">
-          Someone shared a secret note with you.
+      <div className="mb-2">
+        <p className="text-xs text-amber-500 uppercase tracking-widest font-medium mb-1">
+          Secret note
         </p>
-        <p className="text-xs text-zinc-600">
-          Enter the password to decrypt and reveal it.
+        <p className="text-sm text-stone-500">
+          Enter the password to decrypt and reveal.
         </p>
       </div>
 
@@ -76,19 +75,19 @@ export default function ViewNote({ id }: { id: string }) {
         type="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        placeholder="Enter password to decrypt"
+        placeholder="Password"
         autoFocus
-        className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-white placeholder-zinc-600 focus:border-zinc-600 focus:outline-none"
+        className="w-full rounded-lg border border-stone-800 bg-stone-900 px-4 py-3 text-sm text-stone-100 placeholder:text-stone-600 focus:outline-none focus:border-amber-500/50 transition-colors duration-200"
       />
 
       {state === "error" && (
-        <p className="text-xs text-red-500">{error}</p>
+        <p className="text-xs text-red-400 animate-fade-in">{error}</p>
       )}
 
       <button
         type="submit"
         disabled={state === "loading" || !password}
-        className="w-full rounded-lg bg-white px-4 py-3 text-sm font-medium text-black hover:bg-zinc-200 disabled:opacity-50 transition-colors"
+        className="w-full rounded-lg bg-amber-500 px-4 py-3 text-sm font-semibold text-stone-950 transition-all duration-150 hover:bg-amber-400 active:scale-[0.97] disabled:opacity-40 disabled:cursor-not-allowed"
       >
         {state === "loading" ? "Decrypting..." : "Reveal secret"}
       </button>

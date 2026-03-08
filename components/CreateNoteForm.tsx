@@ -6,6 +6,9 @@ import { ExpiryOption } from "@/types/note";
 
 type Step = "form" | "done";
 
+const field =
+  "w-full rounded-lg border border-stone-800 bg-stone-900 px-4 py-3 text-sm text-stone-100 placeholder:text-stone-600 focus:outline-none focus:border-amber-500/50 transition-colors duration-200";
+
 export default function CreateNoteForm() {
   const [content, setContent] = useState("");
   const [password, setPassword] = useState("");
@@ -14,12 +17,13 @@ export default function CreateNoteForm() {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<Step>("form");
   const [noteUrl, setNoteUrl] = useState("");
+  const [copied, setCopied] = useState(false);
   const [error, setError] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    if (!content.trim()) return setError("Note content is required.");
+    if (!content.trim()) return setError("Write something first.");
     if (!password) return setError("Password is required.");
 
     setLoading(true);
@@ -30,9 +34,7 @@ export default function CreateNoteForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ciphertext, iv, salt, burnAfterRead, expiry }),
       });
-
-      if (!res.ok) throw new Error("Failed to create note");
-
+      if (!res.ok) throw new Error();
       const { id } = await res.json();
       setNoteUrl(`${window.location.origin}/${id}`);
       setStep("done");
@@ -43,8 +45,10 @@ export default function CreateNoteForm() {
     }
   }
 
-  function copyUrl() {
-    navigator.clipboard.writeText(noteUrl);
+  async function copyUrl() {
+    await navigator.clipboard.writeText(noteUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   }
 
   function reset() {
@@ -55,94 +59,103 @@ export default function CreateNoteForm() {
     setStep("form");
     setNoteUrl("");
     setError("");
+    setCopied(false);
   }
 
   if (step === "done") {
     return (
-      <div className="space-y-6">
-        <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-6">
-          <p className="text-xs text-zinc-500 uppercase tracking-wider mb-3">
-            Your secret link
+      <div className="animate-fade-in space-y-6">
+        <div>
+          <p className="text-xs text-amber-500 uppercase tracking-widest font-medium mb-3">
+            Secret link ready
           </p>
-          <p className="break-all text-sm text-white mb-4">{noteUrl}</p>
-          <div className="flex gap-3">
-            <button
-              onClick={copyUrl}
-              className="flex-1 rounded border border-zinc-700 bg-zinc-900 px-4 py-2 text-sm text-white hover:bg-zinc-800 transition-colors"
-            >
-              Copy link
-            </button>
-            <button
-              onClick={reset}
-              className="flex-1 rounded border border-zinc-700 bg-zinc-900 px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-800 transition-colors"
-            >
-              Create another
-            </button>
-          </div>
+          <p className="font-mono text-sm text-stone-100 break-all leading-relaxed">
+            {noteUrl}
+          </p>
         </div>
-        <p className="text-xs text-zinc-600 text-center">
-          Share the link and the password separately. The server cannot read
-          your note.
+
+        <div className="border-t border-stone-800 pt-5 flex gap-3">
+          <button
+            onClick={copyUrl}
+            className="flex-1 rounded-lg border border-stone-800 bg-stone-900 px-4 py-2.5 text-sm text-stone-100 transition-all duration-150 hover:border-amber-500/40 active:scale-[0.97]"
+          >
+            {copied ? "Copied!" : "Copy link"}
+          </button>
+          <button
+            onClick={reset}
+            className="flex-1 rounded-lg px-4 py-2.5 text-sm text-stone-500 transition-colors hover:text-stone-100"
+          >
+            New note
+          </button>
+        </div>
+
+        <p className="text-xs text-stone-600">
+          Share the link and password separately — the server cannot read your
+          note.
         </p>
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="Paste a password, token, or private message..."
-          rows={6}
-          className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-white placeholder-zinc-600 focus:border-zinc-600 focus:outline-none resize-none"
-        />
-      </div>
+    <form onSubmit={handleSubmit} className="space-y-3">
+      <textarea
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        placeholder="Paste a password, token, or private message..."
+        rows={5}
+        className={`${field} resize-none`}
+      />
 
-      <div>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Encryption password"
-          className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-white placeholder-zinc-600 focus:border-zinc-600 focus:outline-none"
-        />
-      </div>
+      <input
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder="Encryption password"
+        className={field}
+      />
 
-      <div className="flex gap-3">
-        <div className="flex-1">
-          <select
-            value={expiry}
-            onChange={(e) => setExpiry(e.target.value as ExpiryOption)}
-            className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-white focus:border-zinc-600 focus:outline-none"
-          >
-            <option value="1h">Expires in 1 hour</option>
-            <option value="24h">Expires in 24 hours</option>
-            <option value="7d">Expires in 7 days</option>
-          </select>
-        </div>
+      <div className="flex items-center gap-3 pt-1">
+        <select
+          value={expiry}
+          onChange={(e) => setExpiry(e.target.value as ExpiryOption)}
+          className={`${field} flex-1 cursor-pointer`}
+        >
+          <option value="1h">Expires in 1 hour</option>
+          <option value="24h">Expires in 24 hours</option>
+          <option value="7d">Expires in 7 days</option>
+        </select>
 
-        <label className="flex items-center gap-2 cursor-pointer px-3">
-          <input
-            type="checkbox"
-            checked={burnAfterRead}
-            onChange={(e) => setBurnAfterRead(e.target.checked)}
-            className="rounded border-zinc-700 bg-zinc-900 text-white focus:ring-0"
-          />
-          <span className="text-sm text-zinc-400">Burn after read</span>
+        <label className="flex items-center gap-2.5 cursor-pointer shrink-0 select-none">
+          <div className="relative">
+            <input
+              type="checkbox"
+              checked={burnAfterRead}
+              onChange={(e) => setBurnAfterRead(e.target.checked)}
+              className="sr-only peer"
+            />
+            <div className="w-8 h-4 rounded-full border border-stone-700 bg-stone-900 peer-checked:border-amber-500/50 peer-checked:bg-amber-500/10 transition-colors duration-200" />
+            <div className="absolute top-0.5 left-0.5 w-3 h-3 rounded-full bg-stone-600 peer-checked:translate-x-4 peer-checked:bg-amber-500 transition-all duration-200" />
+          </div>
+          <span className="text-xs text-stone-500">Burn after read</span>
         </label>
       </div>
 
-      {error && <p className="text-xs text-red-500">{error}</p>}
+      {error && (
+        <p className="text-xs text-red-400 animate-fade-in">{error}</p>
+      )}
 
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-lg bg-white px-4 py-3 text-sm font-medium text-black hover:bg-zinc-200 disabled:opacity-50 transition-colors"
+        className="w-full rounded-lg bg-amber-500 px-4 py-3 text-sm font-semibold text-stone-950 transition-all duration-150 hover:bg-amber-400 active:scale-[0.97] disabled:opacity-40 disabled:cursor-not-allowed mt-1"
       >
         {loading ? "Encrypting..." : "Create secret link"}
       </button>
+
+      <p className="text-xs text-stone-600 text-center pt-0.5">
+        Encrypted in your browser — the server sees only ciphertext.
+      </p>
     </form>
   );
 }
