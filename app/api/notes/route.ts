@@ -14,7 +14,10 @@ export async function POST(request: Request) {
     };
 
     if (!ciphertext || !iv || !salt) {
-      return Response.json({ error: "Missing required fields" }, { status: 400 });
+      return Response.json(
+        { error: "Missing required fields" },
+        { status: 400 },
+      );
     }
 
     const ttl = EXPIRY_SECONDS[expiry] ?? EXPIRY_SECONDS["24h"];
